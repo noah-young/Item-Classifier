@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Object Classifier</string>
+    <string name="book">Computer Science Book</string>
+    <string name="pencil">No. 2 Pencil</string>
+    <string name="scissors">Craft Scissors</string>
+    <string name="mug">Simple Mug</string>
+    <string name="remote">TV Remote</string>
+
+    <string name="bookDesc">Helping engineers ace their next interview.</string>
+    <string name="pencilDesc">A classic writing utensil.</string>
+    <string name="scissorsDesc">Beats paper everytime.</string>
+    <string name="mugDesc">Enjoy your morning coffee.</string>
+    <string name="remoteDesc">Can\'t ever find this when you need it.</string>
+</resources>
