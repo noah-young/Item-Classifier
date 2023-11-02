@@ -3,8 +3,6 @@ package com.example.itemclassifier
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.Manifest
-import android.app.Activity
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -24,7 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
@@ -63,16 +61,13 @@ import androidx.core.content.ContextCompat
 import com.example.itemclassifier.data.Datasource
 import com.example.itemclassifier.model.Item
 import com.example.itemclassifier.ui.theme.ItemClassifierTheme
-import java.util.concurrent.Executor
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+//import java.util.concurrent.ExecutorService
+//import java.util.concurrent.Executors
 
 private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
 
 class MainActivity : ComponentActivity() {
-    private lateinit var cameraExecutor: ExecutorService
+    //private lateinit var cameraExecutor: ExecutorService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,15 +81,13 @@ class MainActivity : ComponentActivity() {
                     MainScaffold(requestCamera = ::requestCamera)
                     Log.d("Test Value", "${shouldShowCamera.value}")
                     if (shouldShowCamera.value) {
-                        CameraView (
-                            executor = cameraExecutor
-                        )
+                        CameraView ()
                     }
                 }
             }
         }
         //requestCamera()
-        cameraExecutor = Executors.newSingleThreadExecutor()
+        //cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
     private fun requestCamera() {
@@ -130,9 +123,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CameraView (
-    executor: Executor
-) {
+fun CameraView () {
     val lensFacing = CameraSelector.LENS_FACING_BACK
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -182,32 +173,45 @@ fun CameraView (
 
 @Composable
 fun ItemCard(item: Item, modifier: Modifier = Modifier) {
-    Card(modifier = modifier.padding(8.dp), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
-        Column {
-            Image(
-                painter = painterResource(item.imageResourceId),
-                contentDescription = stringResource(item.nameResourceId),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(194.dp),
-                contentScale = ContentScale.Crop
-            )
-            Text(
-                text = stringResource(item.nameResourceId),
-                modifier = Modifier.padding(horizontal =  16.dp, vertical = 8.dp),
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = stringResource(item.descResourceId),
-                modifier = Modifier.padding(horizontal =  16.dp, vertical = 8.dp),
-                style = MaterialTheme.typography.bodyMedium
+    Card(
+        modifier = modifier.padding(8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column {
+                Image(
+                    painter = painterResource(item.imageResourceId),
+                    contentDescription = stringResource(item.nameResourceId),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(194.dp),
+                    contentScale = ContentScale.Crop
+                )
+                Text(
+                    text = stringResource(item.nameResourceId),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = stringResource(item.descResourceId),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Icon(
+                modifier = Modifier.padding(8.dp),
+                imageVector = Icons.Filled.ArrowForward,
+                contentDescription = "Localized description"
             )
         }
     }
 }
 
 @Composable
-private fun ItemList(itemList: List<Item>, modifier: Modifier = Modifier) {
+private fun ItemList(itemList: List<Item>) {
     LazyColumn {
         items(itemList){ item ->
             ItemCard(item)
@@ -229,28 +233,31 @@ fun MainScaffold(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold (
         topBar = {
-            CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text(
-                        "Item Classifier",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                actions = {
-                    IconButton(onClick = { /* click action */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
+            Surface (shadowElevation = 2.dp) {
+                CenterAlignedTopAppBar(
+                    modifier = Modifier.padding(5.dp),
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    title = {
+                        Text(
+                            "Item Classifier",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
+                    },
+                    actions = {
+                        IconButton(onClick = { /* click action */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "Localized description"
+                            )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { requestCamera() }) {
@@ -259,8 +266,7 @@ fun MainScaffold(
         }
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .padding(innerPadding),
+            modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ItemList(itemList = Datasource().loadItems())
