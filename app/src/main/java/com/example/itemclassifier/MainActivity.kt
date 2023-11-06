@@ -11,6 +11,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -80,7 +87,15 @@ class MainActivity : ComponentActivity() {
                 ) {
                     MainScaffold(requestCamera = ::requestCamera)
                     Log.d("Test Value", "${shouldShowCamera.value}")
-                    if (shouldShowCamera.value) {
+                    AnimatedVisibility (
+                        shouldShowCamera.value,
+                        enter = slideInVertically( initialOffsetY = { it / 2 } )
+                                + expandVertically ( expandFrom = Alignment.Top )
+                                + fadeIn(),
+                        exit = slideOutVertically( targetOffsetY = { it / 2 } )
+                                + shrinkVertically( shrinkTowards = Alignment.Top )
+                                + fadeOut()
+                    ) {
                         CameraView ()
                     }
                 }
