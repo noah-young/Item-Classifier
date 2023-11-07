@@ -29,16 +29,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.*
+//import androidx.compose.material.icons.filled.Camera
+//import androidx.compose.material.icons.filled.Close
+//import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
 //import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -251,10 +254,6 @@ fun MainScaffold(
             Surface (shadowElevation = 2.dp) {
                 CenterAlignedTopAppBar(
                     modifier = Modifier.padding(5.dp),
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                    ),
                     title = {
                         Text(
                             "Item Classifier",
@@ -274,11 +273,33 @@ fun MainScaffold(
                 )
             }
         },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { requestCamera() }) {
-                Icon(Icons.Default.Camera, contentDescription = "Add")
-            }
-        }
+        bottomBar = {
+            BottomAppBar(
+                actions = {
+                    IconButton(onClick = { /* do something */ }) {
+                        Icon(
+                            Icons.Filled.Search,
+                            contentDescription = "Localized description",
+                        )
+                    }
+                    IconButton(onClick = { /* do something */ }) {
+                        Icon(
+                            Icons.Filled.Info,
+                            contentDescription = "Localized description",
+                        )
+                    }
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = { requestCamera() },
+                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+                    ) {
+                        Icon(Icons.Filled.Camera, "Localized description")
+                    }
+                }
+            )
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding),
