@@ -48,6 +48,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -274,8 +275,15 @@ fun MainScaffold(
             }
         },
         bottomBar = {
+            var searchText = remember { mutableStateOf("") }
             BottomAppBar(
                 actions = {
+                    /* TextField(
+                        value = searchText.value,
+                        onValueChange = {value ->
+                            searchText.value = value
+                        }
+                    ) */
                     IconButton(onClick = { /* do something */ }) {
                         Icon(
                             Icons.Filled.Search,
