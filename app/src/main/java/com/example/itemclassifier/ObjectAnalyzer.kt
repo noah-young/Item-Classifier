@@ -9,7 +9,20 @@ class ObjectAnalyzer (
     private val classifier: ObjectClassifier,
     private val onResults: (List<Classification>) -> Unit
 ): ImageAnalysis.Analyzer {
-    override fun analyze (image: ImageProxy) {
+    private var frameSkipCounter = 0
 
+    /*
+     * Analyzes a 1/60 frames
+     */
+    override fun analyze (image: ImageProxy) {
+        if (frameSkipCounter % 60 == 0) {
+            val rotationDegrees = image.imageInfo.rotationDegrees
+            val bitmap = image.toBitmap()
+
+            val results = classifier.classify(bitmap, rotationDegrees)
+            onResults(results)
+        }
+        frameSkipCounter++
+        image.close()
     }
 }

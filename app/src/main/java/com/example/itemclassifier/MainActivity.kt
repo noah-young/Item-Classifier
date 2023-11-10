@@ -10,6 +10,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -19,6 +21,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,12 +33,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-//import androidx.compose.material.icons.filled.Camera
-//import androidx.compose.material.icons.filled.Close
-//import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
-//import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -54,8 +53,10 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -63,17 +64,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.itemclassifier.data.Datasource
+import com.example.itemclassifier.data.TfLiteObjectClassifier
+import com.example.itemclassifier.domain.Classification
 import com.example.itemclassifier.model.Item
 import com.example.itemclassifier.ui.theme.ItemClassifierTheme
-//import java.util.concurrent.ExecutorService
-//import java.util.concurrent.Executors
 
 private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
 
@@ -84,6 +87,31 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ItemClassifierTheme {
+                var classification by remember {
+                    mutableStateOf(emptyList<Classification>())
+                }
+
+                val analyzer = remember {
+                    ObjectAnalyzer (
+                        classifier = TfLiteObjectClassifier (
+                            context = applicationContext
+                        ),
+                        onResults = {
+                            classification = it
+                        }
+                    )
+                }
+
+                var controller = remember {
+                    LifecycleCameraController(applicationContext).apply {
+                        setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
+                        setImageAnalysisAnalyzer(
+                            ContextCompat.getMainExecutor(applicationContext),
+                            analyzer
+                        )
+                    }
+                }
+
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -100,7 +128,30 @@ class MainActivity : ComponentActivity() {
                                 + shrinkVertically( shrinkTowards = Alignment.Top )
                                 + fadeOut()
                     ) {
-                        CameraView ()
+                        Box (
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            CameraView(controller)
+
+                            Column (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.TopCenter)
+                            ) {
+                                classification.forEach {
+                                    Text (
+                                        text = it.objName,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.primaryContainer)
+                                            .padding(8.dp),
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 16.sp,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -142,14 +193,19 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CameraView () {
+fun CameraView (
+    controller: LifecycleCameraController
+) {
     val lensFacing = CameraSelector.LENS_FACING_BACK
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
     val preview = androidx.camera.core.Preview.Builder().build()
     val previewView = remember {
-        PreviewView(context)
+        PreviewView(context).apply {
+            this.controller = controller
+            controller.bindToLifecycle(lifecycleOwner)
+        }
     }
     val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
 
@@ -179,7 +235,10 @@ fun CameraView () {
     }
 
     Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.fillMaxSize()) {
-        AndroidView({previewView}, modifier = Modifier.fillMaxSize())
+        AndroidView(
+            {previewView},
+            modifier = Modifier.fillMaxSize()
+        )
 
         IconButton(onClick = { shouldShowCamera.value = false }) {
             Icon(
