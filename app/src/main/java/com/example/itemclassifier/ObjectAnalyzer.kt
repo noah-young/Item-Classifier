@@ -11,11 +11,12 @@ class ObjectAnalyzer (
 ): ImageAnalysis.Analyzer {
     private var frameSkipCounter = 0
 
-    /*
-     * Analyzes a 1/60 frames
+    /**
+     * Analyzes a 1/n frames
      */
     override fun analyze (image: ImageProxy) {
-        if (frameSkipCounter % 60 == 0) {
+        val n = 10
+        if (frameSkipCounter % n == 0) {
             val rotationDegrees = image.imageInfo.rotationDegrees
             val bitmap = image.toBitmap()
 

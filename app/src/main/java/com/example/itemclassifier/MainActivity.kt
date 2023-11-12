@@ -8,8 +8,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.CameraSelector
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
@@ -47,11 +45,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+//import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -102,7 +99,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                var controller = remember {
+                val controller = remember {
                     LifecycleCameraController(applicationContext).apply {
                         setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
                         setImageAnalysisAnalyzer(
@@ -139,6 +136,7 @@ class MainActivity : ComponentActivity() {
                                     .align(Alignment.TopCenter)
                             ) {
                                 classification.forEach {
+                                    Log.d("Obj", it.objName)
                                     Text (
                                         text = it.objName,
                                         modifier = Modifier
@@ -196,47 +194,20 @@ class MainActivity : ComponentActivity() {
 fun CameraView (
     controller: LifecycleCameraController
 ) {
-    val lensFacing = CameraSelector.LENS_FACING_BACK
+    //val lensFacing = CameraSelector.LENS_FACING_BACK
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val preview = androidx.camera.core.Preview.Builder().build()
     val previewView = remember {
         PreviewView(context).apply {
             this.controller = controller
             controller.bindToLifecycle(lifecycleOwner)
         }
     }
-    val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-
-    LaunchedEffect(lensFacing) {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-
-        cameraProviderFuture.addListener( {
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            try {
-                // Unbind use cases before rebinding
-                cameraProvider.unbindAll()
-
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(
-                    lifecycleOwner,
-                    cameraSelector,
-                    preview)
-
-                preview.setSurfaceProvider(previewView.surfaceProvider)
-
-            } catch(exc: Exception) {
-                Log.e("TAG", "Use case binding failed", exc)
-            }
-
-        }, ContextCompat.getMainExecutor(context))
-    }
 
     Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.fillMaxSize()) {
         AndroidView(
-            {previewView},
+            { previewView },
             modifier = Modifier.fillMaxSize()
         )
 
@@ -334,7 +305,7 @@ fun MainScaffold(
             }
         },
         bottomBar = {
-            var searchText = remember { mutableStateOf("") }
+            //var searchText = remember { mutableStateOf("") }
             BottomAppBar(
                 actions = {
                     /* TextField(

@@ -19,7 +19,7 @@ class TfLiteObjectClassifier (
 
     private var classifier: ImageClassifier? = null
 
-    /*
+    /**
      * Builds the Image Processor.
      */
     private fun setupClassifer () {
@@ -43,7 +43,7 @@ class TfLiteObjectClassifier (
         }
     }
 
-    /*
+    /**
      * Classifies the image from the frame.
      * Returns the object's name and confidence score.
      */
@@ -64,14 +64,14 @@ class TfLiteObjectClassifier (
         return results?.flatMap { classifications ->
             classifications.categories.map {category ->
                 Classification(
-                    objName = category.displayName,
+                    objName = category.label,
                     objScore = category.score
                 )
             }
         }?.distinctBy { it.objName } ?: emptyList()
     }
 
-    /*
+    /**
      * Returns the Image Processing Orientation from rotation
      */
     private fun getOrientationFromRotation (rotation: Int): ImageProcessingOptions.Orientation {
