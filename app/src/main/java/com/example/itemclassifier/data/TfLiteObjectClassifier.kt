@@ -63,8 +63,9 @@ class TfLiteObjectClassifier (
 
         return results?.flatMap { classifications ->
             classifications.categories.map {category ->
+                val name = category.label.substring(2)
                 Classification(
-                    objName = category.label,
+                    objName = name,
                     objScore = category.score
                 )
             }

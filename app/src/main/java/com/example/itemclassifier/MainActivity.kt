@@ -19,7 +19,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,11 +60,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -133,20 +130,10 @@ class MainActivity : ComponentActivity() {
                             Column (
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .align(Alignment.TopCenter)
+                                    .align(Alignment.BottomCenter)
                             ) {
                                 classification.forEach {
-                                    Log.d("Obj", it.objName)
-                                    Text (
-                                        text = it.objName,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .background(MaterialTheme.colorScheme.primaryContainer)
-                                            .padding(8.dp),
-                                        textAlign = TextAlign.Center,
-                                        fontSize = 16.sp,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
+                                    ItemCard(Datasource().loadItem(it.objName))
                                 }
                             }
                         }
@@ -154,8 +141,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        //requestCamera()
-        //cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
     private fun requestCamera() {
@@ -205,7 +190,10 @@ fun CameraView (
         }
     }
 
-    Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.fillMaxSize()) {
+    Box(
+        contentAlignment = Alignment.TopEnd,
+        modifier = Modifier.fillMaxSize()
+    ) {
         AndroidView(
             { previewView },
             modifier = Modifier.fillMaxSize()
@@ -227,8 +215,7 @@ fun ItemCard(item: Item, modifier: Modifier = Modifier) {
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(
-            contentAlignment = Alignment.BottomEnd,
-            modifier = Modifier.fillMaxSize()
+            contentAlignment = Alignment.BottomEnd
         ) {
             Column {
                 Image(
@@ -271,7 +258,7 @@ private fun ItemList(itemList: List<Item>) {
 @Preview
 @Composable
 private fun ItemCardPreview() {
-    ItemCard(Item(R.string.book, R.string.bookDesc, R.drawable.book))
+    ItemCard(Item(R.string.Book, R.string.bookDesc, R.drawable.book))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
