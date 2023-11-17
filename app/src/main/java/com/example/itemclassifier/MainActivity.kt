@@ -12,11 +12,15 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -73,10 +77,10 @@ import com.example.itemclassifier.model.Item
 import com.example.itemclassifier.ui.theme.ItemClassifierTheme
 
 private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
+private var shouldShowItemPage: MutableState<Boolean> = mutableStateOf(false)
+private var activeItem: Item = Datasource().loadItem("Book")
 
 class MainActivity : ComponentActivity() {
-    //private lateinit var cameraExecutor: ExecutorService
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -113,6 +117,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     MainScaffold(requestCamera = ::requestCamera)
                     Log.d("Test Value", "${shouldShowCamera.value}")
+
+                    // Open the camera
                     AnimatedVisibility (
                         shouldShowCamera.value,
                         enter = slideInVertically( initialOffsetY = { it / 2 } )
@@ -137,6 +143,17 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
+                    }
+
+                    // Open the active item details page
+                    AnimatedVisibility (
+                        shouldShowItemPage.value,
+                        enter =  slideInHorizontally ( initialOffsetX = { it / 2 } )
+                                + expandHorizontally ( expandFrom = Alignment.End ),
+                        exit = slideOutHorizontally( targetOffsetX = { it / 2 } )
+                                + shrinkHorizontally ( shrinkTowards = Alignment.End )
+                    ) {
+                        ItemPage(activeItem)
                     }
                 }
             }
@@ -172,6 +189,10 @@ class MainActivity : ComponentActivity() {
         } else {
             Toast.makeText(baseContext, "Camera access denied.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    fun setShouldShowItemPage (showVal: Boolean) {
+        shouldShowItemPage.value = showVal
     }
 }
 
@@ -209,7 +230,10 @@ fun CameraView (
 }
 
 @Composable
-fun ItemCard(item: Item, modifier: Modifier = Modifier) {
+fun ItemCard(
+    item: Item,
+    modifier: Modifier = Modifier
+) {
     Card(
         modifier = modifier.padding(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -237,11 +261,16 @@ fun ItemCard(item: Item, modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-            Icon(
-                modifier = Modifier.padding(8.dp),
-                imageVector = Icons.Filled.ArrowForward,
-                contentDescription = "Localized description"
-            )
+            IconButton(onClick = {
+                shouldShowItemPage.value = true
+                activeItem = item
+            }) {
+                Icon(
+                    modifier = Modifier.padding(8.dp),
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = "Localized description"
+                )
+            }
         }
     }
 }

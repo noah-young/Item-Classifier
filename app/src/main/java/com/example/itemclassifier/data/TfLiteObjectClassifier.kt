@@ -13,8 +13,8 @@ import org.tensorflow.lite.task.vision.classifier.ImageClassifier
 
 class TfLiteObjectClassifier (
     private val context: Context,
-    private val threshold: Float = 0.5f,
-    private val maxResults: Int = 2
+    private val threshold: Float = 0.6f,
+    private val maxResults: Int = 1
 ): ObjectClassifier {
 
     private var classifier: ImageClassifier? = null
