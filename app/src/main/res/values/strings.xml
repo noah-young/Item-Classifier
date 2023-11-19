@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Object Classifier</string>
+    <string name="app_name">Classify</string>
     <string name="Book">Computer Science Book</string>
     <string name="Pencil">No. 2 Pencil</string>
     <string name="Scissors">Craft Scissors</string>

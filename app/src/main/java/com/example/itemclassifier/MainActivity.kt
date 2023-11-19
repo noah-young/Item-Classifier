@@ -30,12 +30,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -48,7 +48,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-//import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -59,6 +58,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -223,6 +224,8 @@ fun CameraView (
         IconButton(onClick = { shouldShowCamera.value = false }) {
             Icon(
                 imageVector = Icons.Filled.Close,
+                modifier = Modifier.size(32.dp),
+                tint = Color.White,
                 contentDescription = "Localized description"
             )
         }
@@ -236,7 +239,10 @@ fun ItemCard(
 ) {
     Card(
         modifier = modifier.padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Box(
             contentAlignment = Alignment.BottomEnd
@@ -252,12 +258,12 @@ fun ItemCard(
                 )
                 Text(
                     text = stringResource(item.nameResourceId),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
                     text = stringResource(item.descResourceId),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -298,9 +304,13 @@ fun MainScaffold(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold (
         topBar = {
-            Surface (shadowElevation = 2.dp) {
+            Surface (shadowElevation = 2.dp, tonalElevation = 2.dp) {
                 CenterAlignedTopAppBar(
-                    modifier = Modifier.padding(5.dp),
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp),
+                    //modifier = Modifier.padding(top = 5.dp, bottom = 5.dp),
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors (
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
                     title = {
                         Text(
                             "Item Classifier",
@@ -321,15 +331,10 @@ fun MainScaffold(
             }
         },
         bottomBar = {
-            //var searchText = remember { mutableStateOf("") }
             BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.shadow(2.dp),
                 actions = {
-                    /* TextField(
-                        value = searchText.value,
-                        onValueChange = {value ->
-                            searchText.value = value
-                        }
-                    ) */
                     IconButton(onClick = { /* do something */ }) {
                         Icon(
                             Icons.Filled.Search,
@@ -346,7 +351,6 @@ fun MainScaffold(
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = { requestCamera() },
-                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                     ) {
                         Icon(Icons.Filled.Camera, "Localized description")

@@ -51,7 +51,6 @@ import com.example.itemclassifier.model.Item
 
 @Composable
 fun ExpandableCard(title: String, item: Item, imageCard: Boolean) {
-
     var expanded by remember { mutableStateOf (false) }
 
     val rotationState by animateFloatAsState(
@@ -62,6 +61,9 @@ fun ExpandableCard(title: String, item: Item, imageCard: Boolean) {
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(
@@ -134,7 +136,7 @@ fun ItemPage(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold (
         topBar = {
-            Surface (shadowElevation = 2.dp) {
+            Surface (shadowElevation = 2.dp, tonalElevation = 2.dp) {
                 CenterAlignedTopAppBar(
                     modifier = Modifier.padding(5.dp),
                     title = {
